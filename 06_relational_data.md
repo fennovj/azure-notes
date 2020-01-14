@@ -42,11 +42,35 @@ Now you can write T-SQL in the command line if you connect to that url.
 
 You have to restrict access in some way, unless it's open data of course. There are three general ways:
 
-- User accounts
+- User accounts in the database itself, depends on the database software used. This is best when you have role-specific permissions like insert privileges etc, which a firewall alone cannot handle.
 - Virtual networks
   - Logically isolated network. Only some resources can connect to the database. The server/database are on different subnets, and have their rules for connecting from/to other networks
 - Firewall rules
   - Basically, you allow input based on ranges of IP adresses
+
+If your app is a single VM + database, you can use any of those three options. Depends I guess, not sure on what exactly.
+
+Keep in mind you ideally have encryption in transit (SSL) and at rest.
+
+### Transparent Data Encryptopn
+
+Encrypting data at rest, perform IO en/decryption. It encrypts data, log and backup.
+
+### Dynamic data masking
+
+Used to make a portion of sensitive data accessible. e.g. only the first three digits of a phone numnber. Administrator still sees the whole thing.
+
+### Database auditing
+
+basically logging so you can see who accessed what data
+
+### Advanced data security
+
+Extra service that provides
+
+- Data discovery and classification - classifies potentially sensitive data
+- vulnerabulity assessment
+- Advanced thread protection
 
 ## Azure database for PostgreSQL
 
@@ -67,7 +91,7 @@ az postgres server create \
    --admin-password "P@ssw0rd"
 ```
 
-### Security
+### Security in postgres
 
 You can use native PostgreSQL user authentication. You can also make a virtual network or a firewall. Exampe: `az postgres server firewall-rule create`.
 
@@ -83,3 +107,9 @@ They are ideal if you have multiple databases with low average, but high peak ut
 If option 1 requires 150% or more of the resources of option 2, then option 2 is worth it. (e.g. if option 1 means only 110% of the resources of option 2, then option 1 is probably simpler and cheaper)
 
 You should add at least two S3 databases or 15 S0 databases, and you can up to 100 or 500 databases depending on performance tier.
+
+You can add multiple elastic pools to a single SQL server, I guess it can take resources from any of them as needed?
+
+### DTU vs vCore
+
+Once again, you can either pick DTU or vCore, DTU means compute vs storage vs IO is preconfigured and simple, vCore means you pick for yourself.
