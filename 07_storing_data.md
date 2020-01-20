@@ -150,7 +150,7 @@ There is a javascript app as well, which is easier for me than C#! Jay!
 Initialization:
 
 ```javascript
-const util = require('util')
+const util = require('util');
 const storage = require('azure-storage');
 const blobService = storage.createBlobService();
 const createContainerAsync = util.promisify(blobService.createContainerIfNotExists).bind(blobService);
