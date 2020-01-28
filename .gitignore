@@ -1,2 +1,6 @@
 *.html
 .vscode
+
+# Example apps
+learning-module
+appservice
