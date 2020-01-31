@@ -1,6 +1,6 @@
 # Azure notes
 
-These are the notes I made while studying for AZ-900, and later AZ-203.
+These are the notes I made while studying the learning path for AZ-900, and later AZ-203.
 
 To compile to html, do: `pandoc *.md > markdown_book.html`.
 
