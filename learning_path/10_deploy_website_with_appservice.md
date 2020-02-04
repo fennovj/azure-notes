@@ -32,6 +32,8 @@ Also, avoid cold start, azure will send a request to root, thereby warming up th
 
 Also, they share vms and deployment plans, only the hostname is different really.
 
+Note that a deployment slot is not a separate instance, an instance is really like a separate VM, deployment slot will just run on the same VM as its 'sibling'.
+
 ### Autoswap
 
 You can configure autoswap for a certain slot, when you update it, it will automatically swap it to another slot.
