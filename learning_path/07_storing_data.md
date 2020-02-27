@@ -78,6 +78,12 @@ each storage account has 2 shared keys that give access to EVERYTHANG. Only use 
 
 This is for external third-party applications. You can add constraints and time range of access. This is for a situation where clients can read/write data to the storage account. It's easiest to make the front-end proxy do the authentication and only forward good requests, but it is more scalable to have a separate authentication service, that communicates with both server and client to get/authenticate a key.
 
+update: There are different kinds of SAS
+
+- User SAS - give permissions to an Azure AD credential
+- Service SAS - secured with the storage account key. Deleates access to a resource
+- Account SAS - secured with the storage account key - you can delegate access to operations that apply at the level of the service, such as Get/Set Service Properties and Get Service Stats operations. You can also delegate access to read, write, and delete operations on blob containers, tables, queues, and file shares that are not permitted with a service SAS.
+
 ### Network access
 
 By default, storage accounts are public. You can additionally restrict them to certain IP ranges or virtual networks.

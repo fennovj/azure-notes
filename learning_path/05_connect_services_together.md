@@ -135,6 +135,13 @@ queueClient.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
 await queueClient.CloseAsync();
 ```
 
+There are also filters:
+
+- SqlFilter(string) - sql
+- CorrelationFilter - checks correlation field specifically
+- TrueFilter/FalseFilter - allow everything/nothing
+- No Filter - just everything I guess
+
 You can also use Topics, just replace 'queueClient' with 'TopicClient' basically
 
 ## Queue storage code

@@ -236,3 +236,18 @@ RBAC uses a whitelist (allow model) to permissions. Best practices:
 You can block modification or deletion. Generally nice to have for critical infrastructure. Mainly used to prevent accidents, since everyone who has the right to modify/delete should already be trusted anyway.
 
 Resource locks apply to everyone, even the owner. However, the owner can remove the lock. This extra step helps to prevent accidents, it does not really help against the admin getting phished, since anyone with the rights to delete also has the rights to remove the lock.
+
+## Moving resources
+
+In general, use tags and consistent naming so you can easily identify what to move where.
+
+Not every resource can be moved: AD domain services, Backup vaults and App service gateways can't be moved. Also, virtual moves can only be moved if 
+
+- All dependants go with it.
+- Certificates can't be moved between subscriptions.
+- Scale sets with standard load balances/standard public IP can't be moved
+- You can't move any managed disks that are in availability zones to different subscriptions.
+
+Documentation here: <https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/move-support-resources>
+
+You can test your move by calling '/validateMoveResources'. The portal does this validation automatically.
