@@ -357,8 +357,9 @@ Considering someone can write to one region, and someone else can read that same
 
 - Strong - linear operations, reads are guaranteed to return the most recent version of an item.
 - Bounded Staleness - Reads lag behind writes by at most t interval
+    - OR! You can also lag behind by at most 'K' updates. Example: We want the current version OR the directly prior version, but not 2 versions ago.
 - Session - Strong consistency within a single client session. It guarantees that reads/writes within a session are processed in order, and you can read your own writes in the correct order (RYW). Outside of a session, there is eventual consistency.
-- Consistent Prefix - Guarantees that you don't see out-of-order writes, so you might see A, B, (and not C yet) but never A, C.
+- Consistent Prefix - Guarantees that you don't see out-of-order writes, so you will always see A, B, C, and never C, B, or even A, C. Latency similar to eventual consistency.
 - Eventual consistency - Out of order reads. You might see out-of-order values, like B, C, A, but eventually you will see C.
 
 Keep in mind that the first two are far easier with a single-write region. This has effects on latency and cost. If you want low latency globally with multiple write regions, the first two are probably not suitable.
