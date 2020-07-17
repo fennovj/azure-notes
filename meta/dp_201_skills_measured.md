@@ -2,7 +2,7 @@
 
 Note this is the version of the exam implemented after July 31 2020
 
-## Design Azure Data Storage Solutions(40-45%)
+## Design Azure Data Storage Solutions (40-45%)
 
 ### Recommend an Azure data storage solution based on requirements
 
@@ -26,7 +26,7 @@ Note this is the version of the exam implemented after July 31 2020
 - design a disaster recovery strategy
 - design for high availability
 
-## Design Data Processing Solutions(25-30%)
+## Design Data Processing Solutions (25-30%)
 
 ### Design batch processing solutions
 
@@ -39,7 +39,7 @@ Note this is the version of the exam implemented after July 31 2020
 - design for real-time processing by using Stream Analytics and Azure Databricks
 - design and provision compute resources
 
-## Design for Data Security and Compliance(25-30%)
+## Design for Data Security and Compliance (25-30%)
 
 ### Design security for source data access
 
