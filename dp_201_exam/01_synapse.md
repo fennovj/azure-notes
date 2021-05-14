@@ -33,6 +33,8 @@ You should not use the server admin role to authenticate users. The Admin can ma
 
 Synapse also supports AD! Which is probably better because of the usual SSO reasons. In general, you still create database users, but just map them to AD identities (such as groups/users), then manage access like usual in SQL.
 
+Example: `CREATE USER [bob@contoso.com] FROM EXTERNAL PROVIDER;`
+
 ### Authorization
 
 You can add roles, such as 'db_datareader', 'db_datawriter'. You can also do something like `GRANT SELECT ON SCHEMA::myschema to username`
@@ -98,10 +100,11 @@ Masking functions are stuff like:
     - special (GUID, binary, etc) --> NULL
 
 You can use the Azure REST API to set these (or az cli, etc)
+This should be used for obvious stuff like customer service reps only seeing the last digits of a phone number and such. It should also be used instead of colum-level security if you still want the column for data engineering purposes. This makes it so engineers can still build and test pipelines on the full dataset without privacy risks. Then of course, the production pipeline is excluded from the rule and will work on the real data.
 
 ## Data Loading
 
-Normally, you would use ETL. However, Synapse uses ELT with MPP (massively parallel processing). That means you don't need resources to transform before loading. This also (must) use PolyBase.
+Normally, you would use ETL. However, Synapse uses ELT with MPP (massively parallel processing). That means you don't need resources to transform before loading. Syapse comes with PLENTY of resources to do any transforming itself after loading. This also (must) use PolyBase.
 
 - Extract the data into a supported format, such as CSV or Parquet. 
     - XML/JSON are not supported. SQL Dumps are not supported, you must dump to csv/parquet instead.
@@ -126,6 +129,19 @@ The staging table should use heap index and round-robin distribution. You might 
 
 - Once the data is loaded into a staging table, use MPP to transform it.
 - use `INSERT INTO ... SELECT` to move it to a permanent table.
+
+### Polybase workflow
+
+Basically, this is a bit more work since the COPY INTO statement does this stuff automatically.
+
+- Create a master key on the database to encrypt the below secrets (only needed once for the entire database)
+- Create a database scoped credential for the blob storage. This credential is the storage account key, used for authentication
+- Create an external data source. This actually contains the blob URL (and the credential above)
+- Create an external File format. This contains no reference to the blob storage, is just a static description of whatever format your files are
+- Run: `CREATE EXTERNAL TABLE [name] ([cols]) WITH (DATA_SOURCE, FILE_FORMAT)`
+- Now you can either run ad-hoc queries, or import the data into SQL Server with a traditional `SELECT INTO` statement.
+
+Basically, a lot of the same stuff as in the COPY INTO statement, except the COPY INTO does it all in one verbose statement and has other functionality POLYBASE doesn't have.
 
 ## Managebility
 

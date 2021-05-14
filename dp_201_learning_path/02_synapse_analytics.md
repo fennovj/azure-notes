@@ -62,3 +62,5 @@ Generally, the importing goes like:
 - Create a destination table (with a clustered columnstore index and a smart distribution such as hash)
 - Optionally, for better performance in the future, create statistics on the columns that feature often in queries
 - Press run!
+
+Keep in mind that Azure usually reccommends to use the COPY INTO statement instead

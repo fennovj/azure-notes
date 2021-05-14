@@ -2,8 +2,8 @@
 
 The skills measured mostly mention Synapse. However, there are some things that are a little different, such as backups, sharding, and elastic pools. So they are written here.
 
-https://docs.microsoft.com/en-us/azure/azure-sql/database/elastic-scale-introduction#sharding
-https://docs.microsoft.com/en-us/azure/architecture/patterns/sharding
+<https://docs.microsoft.com/en-us/azure/azure-sql/database/elastic-scale-introduction#sharding>
+<https://docs.microsoft.com/en-us/azure/architecture/patterns/sharding>
 
 ## Sharding
 
@@ -14,12 +14,13 @@ Sharding is not really only SQL Database, but still interesting to know. The mai
 Each shard has the same schema but different subset of data. You can scale and use off-the-shelf, cheaper hardware. Balance workloads across shards. Or locate shards physically close to users that will need that part of the data.
 
 The shard key should be static, and (almost) never change. You generally want to shard on the thing that is most often queries on (WHERE). You can even use a composite shard if there really are multiple values often queries on.
+You also want the shard key to be well distributed. Otherwise every query will go to the same shard anyway, making sharding useless.
 
 - The lookup Strategy
-    - The shard key is a unique value. The sharding logic is essentially a lookup table. The advantage over hash is that you have more control over the physical locations of certian records.
+    - The shard key is a unique value. The sharding logic is essentially a lookup table. The advantage over hash is that you have more control over the physical locations of certian records. For example, placing US customers in a shard in the US.
 - The range strategy
     - The shard key is ordered, and shards are defined based on a range. Useful when there are a lot of range lookups (wow), and easy to implement.
--  The hash strategy
+- The hash strategy
     - reduces hotspots (shards with way more data). Sharding strategy is just computing the hash(es) on every query. Rebalancing shards may be difficult if it's still unbalanced.
 
 ### Multi-tenant vs Single-Tenant
@@ -39,8 +40,8 @@ Elastic queries are those that span multiple databases. Maybe don't use in the a
 
 There are two secnarios:
 
-- Vertical partitioning: There are two different databases with different schemas we want to cross-query
-- Horizontal partitioning: There are horizontal partitions of the same schema.
+- Vertical patterns: There are two different databases with different schemas we want to cross-query
+- Horizontal patterns: There are horizontal partitions of the same schema.
 
 Basically, an elastic query makes external data available in another sql table. There are some possibilities:
 
@@ -72,6 +73,8 @@ Elastic pools have the usual features: PITR, Geo-restore, Active-geo-replication
 ### Active geo-replication
 
 Keeps a secondary database in a same or different data center. Generally, you want a traffic manager that will automatically redirect traffic to the secondary data center if the primary fails.
+
+If you just enable plain geo-replication, you have to manually restore the database, and users have to change their connection string. I'm not sure whjat trhe difference between geo-replication and geo-redundancy is.
 
 (useless factoid!) A lot of incidents can be self-mitigated by a single database. The most common case where geo-replication is needed is the tenant ring going down due to OS kernel memory leaks on the compute nodes, or someone cutting a wrong network cable during a routine operation. Of course Azure will fix these eventually, but they are main causes of extended downtime.
 
@@ -133,7 +136,7 @@ Make it constant time. This is done by versioning all physical modifications. Ph
 
 Note that physical modifications are things like lock acquisition, cache invalidation, etcetera. Logical modifications are stuff like selecting and updating values. Logical modifications are VERY easy to undo.
 
-- Analysis phase: Same as above. Also reconstruct 
+- Analysis phase: Same as above. Also reconstruct
 - Redo Phase:
     - First, redo only the few operations from sLog
     - Then, redo from the last checkpoint of the database (since all other operations were already committed anyway)
@@ -145,9 +148,9 @@ So in conclusion: a lot of text, and I still don't fully understand the 'version
 
 ## Managed instance
 
-I don't really understand the name, but by far the main feature of this is it is near 100% compatible with SQL Server (enterprise edition). The whole thing is hosted in a VNet for security reasons (existing on-prem SQL servers are most likely also isolated in a private network, so this is a good replacement), and is basically intended to be an easy lift-and-shift for existing SQL Server customers.
+I don't really understand the name, but the main feature of this is it is near 100% compatible with SQL Server (enterprise edition). The whole thing is hosted in a VNet for security reasons (existing on-prem SQL servers are most likely also isolated in a private network, so this is a good replacement), and is basically intended to be an easy lift-and-shift for existing SQL Server customers.
 
-It's still a PaaS, so you don't really 'Manage' the instance directly or anything, which is why I don't really understand the name. I guess it's to differentiate from SQL Server, not from Azure SQL Database. Like, "it's just like SQL Server, but the instance is completely managed by Microsoft!". Of note: there is an alternative if you really want to manage the instance yourself... Hosting your own SQL Database on a VM!
+It's still a PaaS, so you don't really 'Manage' the instance directly or anything, which is why I don't really understand the name. I guess it's to differentiate from SQL Server, not from Azure SQL Database. Like, "it's just like SQL Server, but the instance is completely managed by Microsoft!". Of note: there is an alternative if you really want to manage the instance yourself... Hosting your own SQL Database on a VM! IaaS is not recommended by Microsoft, but still a supported option for which they write blogs/instructions etc because sometimes it's just required.
 
 ## Pricing / Service Tiers
 
@@ -157,8 +160,12 @@ You generally pay for DTU model or vCore model. For DTU model, there is also a s
 - Standard: max 35 day backup retention. max 1TB per database
 - Premium: same as above, but supports OLTP in-memory. max 4TB per database
 
-Also, premium has a higher response time requirement. This following numbers are ran on a 'representative' benchmark of real-world data.
+Also, premium just has a beter response time. This following numbers are ran on a 'representative' benchmark of real-world data.
 
 - Basic: 80th percentile at 2 seconds.
 - Standard: 90th percentile at 1 seconds.
 - Premium: 95th percentile at 0.5 seconds.
+
+## Authentication
+
+Quick note about authentication: SQL database also supports Azure AD, by making an AD Admin, and running something like `CREATE USER [bob@contoso.com] FROM EXTERNAL PROVIDER;`.
