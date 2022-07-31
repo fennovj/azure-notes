@@ -75,3 +75,5 @@ Another thing of importance: Route 53 charges for CNAME queries, but not for Ali
 ## Load balancer types
 
 <https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/introduction.html>
+
+Main difference: Classic can only inspect Ip adress and port, whereas Application can also inspect application-content such as endpoint.

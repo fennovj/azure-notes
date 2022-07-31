@@ -10,7 +10,7 @@
 - Snowball - This is the one where AWS literally ships you a hard drive, up to 80TB. After you transfer your data on it, it's shipped back and dumped in S3. Snowball is the service, 'Snowball Edge' is the name of the device itself. You can also order a Compute-Optimized Snowball Edge, which is like a data-center in a box, that you can run EC2 instances on if you want. Mainly useful if you are in a remote location but still want to use like Terraform or something.
   - There is also Snowcone which is much smaller but portable (meant for remote locations like power stations), and Snowmobile, which is a 45-foot truck that can store up to 100PB. Tanenbaum was right again.
 - Migration Hub - This is a place to track your on-premise/aws resources, and the progress of migrations. It doesn't cost/do anything by itself, I guess it just exists to organize all the myriad of stuff above.
-- Transit Gateway - A gateway to multiple AWS services to connect to your on-prem data centre. The main goal is if you are using VPC Peering on multiple VPC's and/or DirectConnect, AWS Transit Gateway means you just VPN to one server (on-prem?) and from there go to all the other AWS stuff.
+- Transit Gateway - A gateway to multiple AWS services to connect to your on-prem data centre. The main goal is if you are using VPC Peering on multiple VPC's and/or DirectConnect, AWS Transit Gateway means you just VPN to one server (on-prem?) and from there go to all the other AWS stuff. Hub-and-Spoke model.
 
 ## Networking
 
@@ -47,3 +47,12 @@
 - EMR (Elastic MapReduce) - Big data platform, can be used to run Spark/Hadoop/Hive/Presto workloads. Can also be used for ETL.
 - OpenSearch - An open source analytics suite that has a data store, search engine, and dashboard. Probably this won't come up as a solution, but it might come up as some sort of data sink. Kinesis Firehose and Cloudwatch have OpenSearch as a built in sink, For S3 or DynamoDb, you will need to use lambda to load data into it.
 - CloudHSM - Hardware Security Module. Can generate and use encryption keys. You can also provision hardware that will do things like TLS/SSL processing for you, without the private key ever leaving the HSM(s)
+
+- CodePipeline
+- CodeDeploy
+- DevOps
+- X-ray
+- Batch
+- Polly
+- Step Functions
+- Simple Workflow Service
