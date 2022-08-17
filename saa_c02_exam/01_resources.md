@@ -21,6 +21,7 @@
 - Global Accelerator - This is like provisioning edge locations. Users are router through the edge locations to your resources. You can check the edge nodes here: <https://aws.amazon.com/global-accelerator/features/>. There are 200 nodes across the world, and you pay per edge location ($0.02/hr), and also a few cents per GB. Again, more expensive than CloudFront for high-throughput applications.
 - PrivateLink - May also be called 'Private VPC Endpoint', as these VPCE's are powered by PrivateLink. The idea is you have a VPC with some service, e.g. a load-balancer, and you want others to access that service without going over the public internet. So you make them connect to some private vpce, and it appears as if your resource is in their VPC. The traffic will be routed over the AWS Backbone instead of over public internet. Note that the source requests must also come from within an AWS VPC.
 - WAF - web application firewall - protects against 'common web exploits' and bots/ddosing. E.g. you can configure it to block requests that look like they are exploiting vulnerabilities specific to PHP/Javascript/whatever you use.
+- NAT Gateway - The *main* usecase is to make instances connect outside of the VPC, but not the other way around. By itself, it does not allow access to the public internet. You generally just need one, in the public subnet. Then, from the private network, you redirect 0.0.0.0/0 to the NAT gateway. The NAT gateway can be in a different route table, that redirects 0.0.0.0/0 to the IGW. Basically, just see it as a weird router that sits in your public subnet. You can have multiple NAT gateways - the only reason is higher resiliency.
 
 ## Storage
 
@@ -38,6 +39,7 @@
 - Kinesis Data Analytics - Stream Analytics kinda thing, allows you to run serverless SQL or Java on a Kinesis Data Stream. You can input/output directly from S3 or Kinesis Data Streams.
 - Kinesis Data Firehose - ETL service, gets data from AWS, *optionally* transforms it (using built-in-transformations), and stores it in S3 or Redshift (or a few others).
 - SQS - Simple queue service, for when Data Streams would be overkill. The main difference is Kinesis is more like Kafka, and Kinesis supports multiple consumers per topic/stream. Kinesis is better for real-time analytics and IoT, SQS is better for microservice decoupling.
+- Data Pipeline - Managed ETL service. Analog to Data Factory. Main usecase is moving data from A to B, and do some minor transformations. Example usecase: move data from S3 to Aurora. Or move data from DynamoDB to S3.
 
 ## Other
 
@@ -48,11 +50,18 @@
 - OpenSearch - An open source analytics suite that has a data store, search engine, and dashboard. Probably this won't come up as a solution, but it might come up as some sort of data sink. Kinesis Firehose and Cloudwatch have OpenSearch as a built in sink, For S3 or DynamoDb, you will need to use lambda to load data into it.
 - CloudHSM - Hardware Security Module. Can generate and use encryption keys. You can also provision hardware that will do things like TLS/SSL processing for you, without the private key ever leaving the HSM(s)
 
-- CodePipeline
-- CodeDeploy
-- DevOps
-- X-ray
-- Batch
-- Polly
-- Step Functions
-- Simple Workflow Service
+## Last minute additions
+
+- CodeBuild - Continuous Integration pipeline runner. mostly CI, can test/build your code, and dump artifacts somewhere.
+- CodePipeline - Continuous Integration pipeline runner. Can run tests, builds, and run Cloudformation or AWS CLI commands. There are also Github/Jenkins plugins. It is a bit of both CI and CD
+- CodeDeploy - Continuous Deployment. Can deploy to EC2, Fargate, Lambda, and on-prem.
+- X-ray - A tool for debugging microservice applications. You can 'trace' data through your microservices, and create a view service map to analyze issues.
+- Batch - A tool to schedule/run some (big) workload. Can run on Fargate or EC2. You submit a job to a 'job queue', configure how many resources you need, AWS does everything else. No additional costs beyond the costs of Fargate/EC2.
+- Polly - SaaS for Text-to-speech. Can mostly be used to create a robot voice for your applications. Mostly used in lambda by calling the Polly API in lambda. (And storing the Audio in S3 if neccecary)
+- Step Functions - Low-code application builder, with built-in connectors. You can do stuff like invoke lambda, run ecs task, etcetera. Not really meant for non-programmers to process their Outlook message or whatever, it's mostly about connecting microservices.
+- Simple Workflow Service - A tool to build microservice application in Java. Mainly, you build asynchronous code using the 'flow framework'. You can use this to e.g. distribute work across multiple machines, wait for output, recover from lost nodes, etcetera. I don't see myself using it since Spark exists, but I'm sure there are good usecases for it.
+- Fargate - Version of Elastic Container Service. Basically, it manages your EC2 instances for you, you just have to define the compute/memory you need, so you don't need to make your own autoscaling groups. Basically more managed and the 'real' version of ECS in my opinion. Can also be used with EKS to automatically provision instances based on your compute needs.
+- Lambda@Edge - Function to run codes in cloudfront edge nodes. Probably the main usecase is to improve cache-hit ratio by doing some preprocessing on the request:
+  - Modify headers, 'normalize' the user agent or query string.
+  - Modify an image (that is in cache) e.g. by resizing, without having to get a different version from the source.
+  - You can also do more complicated stuff like A/B testing
