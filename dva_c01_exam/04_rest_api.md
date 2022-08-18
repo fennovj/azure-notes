@@ -29,7 +29,7 @@ There are multiple integration types:
 - HTTP_PROXY - Custom HTTP endpoint, but this straight up forwards the requests/responses. Best if you are just using API Gateway for authentication/staging.
 - MOCK - Returns a response without actually sending the response to the backend. Used e.g. in a test environment where you don't want to set up a full backend.
 
-Another note: for lambda proxies specifically, lambda *must* return a response of the form:
+Another note: for lambda proxies specifically (`AWS_PROXY`), lambda *must* return a response of the form:
 
 ```
 {

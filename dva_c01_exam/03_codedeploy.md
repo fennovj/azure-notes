@@ -1,5 +1,7 @@
 # Deployment policies
 
+Todo what is codedeploy? Does it cost extra?
+
 There are different services that use deployment policies, mainly Beanstalk and API Gateway. The goal is that you have some EC2 instances that run some app, and you want to 'switch over' to EC2 instances with the new version, possibly without interrupting service, possiby while minimizing costs.
 
 - Blue/Green Deployment - Deploy an ENTIRE new environment. Especially in Beanstalk. You now have 2 environments, now switch over the DNS CNAME record to point to the new environment. Then after a few minutes, shut down the old environment (when user sessions have ended)

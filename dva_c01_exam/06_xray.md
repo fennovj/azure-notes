@@ -19,7 +19,7 @@ Metadata are similar to annotations, but *not indexed*, and cannot be used to se
 
 To use x-ray in lambda, you have to add the following code (python example):
 
-`from aws_xray_sdk.core import path_all; patch_all()`
+`from aws_xray_sdk.core import patch_all; patch_all()`
 
 Lambda is smart enough that it will record info like execution time by itself. There are three environment variables related to X-ray in lambda:
 
