@@ -29,6 +29,8 @@ Lambda is smart enough that it will record info like execution time by itself. T
 
 ## X-ray SDK
 
+*Important* you must be running the X-ray daemon somewhere, X-ray doesn't just work magically, you have to pay for the daemon. Also, you must be able to communicate with the daemon on port 2000, UDP. If you want, in EC2, you can run the x-ray daemon on localhost, in which case you don't need to open port 2000.
+
 Used in your own applications, e.g. EC2 or ECS. Works like:
 
 ```
@@ -49,3 +51,7 @@ There are other environment variables:
 - `AWS_XRAY_TRACING_NAME` - set the service name used to name the segments
 - `PLUGINS` - contains the list of plugins (set by the code above)
 - `SAMPLING_RULES` - define sampling rules. Default is first every second, 5% of the others.
+
+## Read results
+
+To read the x-ray results, you can either use the AWS website, or you can read the traces with `GetTraceSummaries` and `BatchGetTraces`. The first is like an S3 `list` operation that just gets the trace IDs, the second one actually gets the traces, given the IDs.

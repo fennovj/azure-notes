@@ -36,8 +36,20 @@ Template specification: <https://docs.aws.amazon.com/serverless-application-mode
 
 - Conditions - Kind of your `count = var.count ? 0 : 1` alternative. Each `Resource` can have a `Condition` field, and refer to a condition listed here. Example: `CreateProd: !Equals [!Ref Environment "prod"]` will make a condition that only evaluates to true if Environment is prod.
 
-- Outputs: List of outputs, again similar to Terraform. Example: `Outputs: InstanceName: Value: !GetAtt EC2Instance Name`
+- Outputs: List of outputs, again similar to Terraform. Example: `Outputs: InstanceName: Value: !GetAtt EC2Instance Name Export: instancename`
+
+The name under 'Export' is the actual name other modules can use. Other modules import with `!ImportValue: instancename`   
 
 - Rules: List of rules to be verified before running. Each rule has a RuleCondition and Assertions. e.g. you can assert that when environment is test, instanceType must be `t2.micro1`. For compliance etc.
 
 - Format Version: Just a standard (but optional!) section to define the template. Looks like `AWSTemplateFormatVersion: "2010-09-09"`. Not neccecary for SAM.
+
+## Features
+
+`Stacksets` is the 'multitenant' solution. It lets you take a single template, and apply it to multiple regions, or multiple accounts. You provide the variables, stacksets will manage/update all stacks at once.
+
+`Change Sets` are like terraform plans - you can create a change set, which will show you all the proposed changes after changing/applying a template
+
+`Rollback Triggers` - You can specify a cloudwatch alarm. If that alarm is breached, cloudformation will rollback the stack to a previously deployed state.
+
+`Registry` - A place for storing resources and modules made by others, both public and private.

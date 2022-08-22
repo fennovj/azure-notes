@@ -8,6 +8,11 @@ To start, a REST API is a collection of endpoints connected to resources. These 
 
 ### Access control
 
+### Method request
+
+The method request is where you receive the request, and check/edit it. E.g. you can do something like validate if there is a `?param=X` GET parameter, and if there is not, just return 400 right away. You can do the same with the headers and request body.
+This is opposed to the integration request below, where you can do mappings, but you can no longer *require* parameters and fail if they're not there.
+
 ### Integration request/response
 
 Integration request is a request that the API Gateway submits to the backend. E.g. you can transform incoming requests. Example: User requests `apigateway.com/q=123`, you sent a POST request to `domain.com` with body `{id: 123}`. API gateway can do those transformations. You can:
@@ -23,8 +28,8 @@ You can also set up an integration response, which means you take in the output,
 
 There are multiple integration types:
 
-- AWS - Set up an AWS Service Action. Most commonly used for invoking Lambdas. You still set up data mappings yourself.
-- AWS_PROXY - invoke AWS (especially lambda), but do all the data mapping automatically. Lambda receives a JSON with all the HTTP Info it could need (headers, query string, etc) <https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format>, and the response is automatically returned.
+- AWS - Invoke a lambda, but you have to define data mappings yourself in api gateway, e.g. define what the return status code is yourself.
+- AWS_PROXY - invoke lambda, but do all the data mapping automatically. Lambda receives a JSON with all the HTTP Info it could need (headers, query string, etc) <https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format>, and the response is automatically returned.
 - HTTP - Call a custom HTTP endpoint, you must set up all data mappings yourself
 - HTTP_PROXY - Custom HTTP endpoint, but this straight up forwards the requests/responses. Best if you are just using API Gateway for authentication/staging.
 - MOCK - Returns a response without actually sending the response to the backend. Used e.g. in a test environment where you don't want to set up a full backend.
@@ -41,6 +46,9 @@ Another note: for lambda proxies specifically (`AWS_PROXY`), lambda *must* retur
 ```
 
 Otherwise, you cannot use `AWS_PROXY` with Lambda, and you will get 502 (bad gateway) errors.
+
+Also, integrations must return in 29 seconds, otherwise you get a 504 error.
+(small note: this is different from the overall lambda timeout, which is 15 minutes.)
 
 ## Deployment
 
@@ -74,3 +82,10 @@ When you update a stage to add a Canary, you add a new release, and there will b
 - Stage Cache - if you want to disable the stage cache or not for the canary (if you don't want canary users to get old cached responses)
 
 Generally, when the canary succeeds, you would then 'Promote' the canary, which will create a deployment that shifts the remaining traffic. You can also 'delete' the canary if you are getting errors.
+
+## Lambda authorizer
+
+Lambda authorizer means you use a lambda to control access. The API Gateway calls the lambda which takes caller identity and returns IAM policy as output.
+
+- Token-based receives caller identity in bearer token (JWT, OAuth)
+- Request-parameter-based authentication receives caller identity in header/query string

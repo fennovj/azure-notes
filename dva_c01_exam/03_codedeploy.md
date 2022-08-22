@@ -1,6 +1,16 @@
 # Deployment policies
 
-Todo what is codedeploy? Does it cost extra?
+## Intro
+
+Code Deploy provides two types of deployment:
+
+- In-place: stop an instance, install newest version, restart the instance. Only EC2/on-premise supports this.
+- Blue/green: start a new instance, and test it. All platforms support this, except on-prem
+
+A revision is a YAML/Json file (AppSpecFile) containing the configurration. For EC2, you must also contain the source code.
+CodeDeploy takes the revision, as well as a configuration (inplace, canary, rolling, etc), and a deployment group (where to deploy to).
+
+## Deployment policies, cont.
 
 There are different services that use deployment policies, mainly Beanstalk and API Gateway. The goal is that you have some EC2 instances that run some app, and you want to 'switch over' to EC2 instances with the new version, possibly without interrupting service, possiby while minimizing costs.
 
