@@ -14,6 +14,8 @@ A secondary index contains a `partition key`, `sort key` and other `projected at
 
 These work by essentially storing the data multiple times, so writing will be a little more expensive.
 
+You cannot create a global secondary index on an existing table, you must recreate the table with the global index, then copy over the data.
+
 ## Page size
 
 Generally, it is better to have an even distribution of small requests, rather than a few random large requests, or many requests in bursts. <https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-query-scan.html#bp-query-scan-spikes>
@@ -33,7 +35,7 @@ It uses Write through caching: writes data to dynamodb first, then replicates to
 
 ## Atomic counters and conditional writes
 
-`Atomic counter` is a way to use DynamoDB, not neccecarily a feature, just an example usecase. The goal is to have a counter that is incremented everytime you write to it, and allows for concurrent writes. This works by writing 'SET x = x + 1', as apposed to reading x, adding 1, and writing the new value, which would not be atomic. Importantly, this can lead to double counting when writes fail and are automatically retried. (since it's not idempotent), so only use if under/overcounting can be tolerated.
+`Atomic counter` is a way to use DynamoDB, not neccecarily a feature, just an example usecase. The goal is to have a counter that is incremented everytime you write to it, and allows for concurrent writes. This works by writing 'SET x = x + 1', as apposed to reading x, adding 1, and writing the new value, which would not be atomic. Importantly, atomic counts can lead to double counting when writes fail and are automatically retried. (since it's not idempotent), so only use if under/overcounting can be tolerated.
 
 `Conditional writes` are writes where you add a condition, and only write if the item fulfills some condition. E.g. write an item with a certain primary key, but don't overwrite if it already exists.
 This can be used to implement locking, e.g. read, do something, then do a conditional write that writes, but only if the item is still the same as when you read it.
@@ -42,7 +44,7 @@ This can be used to implement locking, e.g. read, do something, then do a condit
 
 Locking mechanisms ensure data is always updated to latest version. E.g. if you read, then update, then write, you kinda want to 'lock' the item during that process. There are three ways of doing this:
 
-KEEP IN MIND THIS IS CLIENT_SIDE ONLY. The lock is not a 'real' lock, it is simply a client-side rule that it chooses to obey
+KEEP IN MIND THIS IS CLIENT_SIDE ONLY. The lock is not a 'real' lock, it is simply a client-side rule that it chooses to obey.
 
 - Optimistic locking: when you read an item, record the version number. If you write, check if the version number has changed, and if not, the update fails. You can simply retrieve item again and try again.
 - Pessimistic Locking: When you retrieve an item, store a 'lock' for that item. Any other writes on that item will fail while the lock is active. This is much more intrusive and can lead to deadlocking etc.
@@ -50,4 +52,4 @@ KEEP IN MIND THIS IS CLIENT_SIDE ONLY. The lock is not a 'real' lock, it is simp
 
 ## Misc
 
-Stinker alert: you cannot create a local secondary index on an existing table. You must create a new table and migrate the data.
+Read queries on indexes only support eventual consistency.

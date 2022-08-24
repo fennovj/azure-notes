@@ -48,7 +48,7 @@ Another note: for lambda proxies specifically (`AWS_PROXY`), lambda *must* retur
 Otherwise, you cannot use `AWS_PROXY` with Lambda, and you will get 502 (bad gateway) errors.
 
 Also, integrations must return in 29 seconds, otherwise you get a 504 error.
-(small note: this is different from the overall lambda timeout, which is 15 minutes.)
+(note: this is different from the overall lambda timeout, which is 15 minutes.)
 
 ## Deployment
 

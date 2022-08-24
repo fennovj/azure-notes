@@ -26,9 +26,11 @@ There is a question of how much 'lambda instances' can you start up right away? 
 - If you increase your quota, the burst limit stays at 3000 so you may get quota issues when usage increases suddenly
 - For other regions, the burst limit is lower: e.g. in Frankfurt it's only 1000, and in some smaller regions it's only 500.
 
+Also, lambda does have a cold start with starting up a 'handler', mainly this can be due to startup handler code, so try to minimize any dependencies/etc. Cold start should not be more than a few seconds unless your handler really sucks. Also you can lower startup time by increasing CPU (see below)
+
 ## CPU
 
-CPU for a lambda is always proportial to memory. The pricing page is priced in `GB-Second`, meaning price for an instance with 1GB memory to run for 1 second. Of course, the price of 2 instances with 500MB memory would be the same.
+CPU for a lambda is always proportial to memory. The pricing page is priced in `GB-Second`, meaning price for an instance with 1GB memory to run for 1 second. The price of 2 instances with 500MB memory would be the same as 1 instance with 1000MB.
 
 Default (and minimum) is 128MB. AWS is unfortunately very opaque about how much CPU you are getting. However, you can safely assume that CPU linearly scales 1-to-1 with memory.
 
@@ -59,9 +61,11 @@ environment variables are set on a 'version'. The main goals are:
 - Allow code changes without having to deploy an entirely new version, meaning easier deployments
 - Prevent hardcoded stuff, like bucket or secret names. Makes it easier to e.g. do multitenancy.
 
+However, you cannot pass environment on a per-request basis, for that you need parameters.
+
 Passing 'parameters' to a lambda is different, this is done in the 'event'. E.g. if you pass the "foo" parameter, you can access that in the lambda by running `event["foo"]` (syntax depending on language)
 How you pass the parameter depends on the method request/mapping template: API gateway has a way of defining parameters directly, based on the input request.
 
 ## Execution environment
 
-Th execution environment is essentially the VM that lambda runs in. This is mainly important if you develop your own runtimes/extensions, since the environment will send 'INIT' and 'SHUTDOWN' signals to them. Essentially due to the serverless nature, these 'INIT' and 'SHUTDOWN' can happen at any time.
+Th execution environment is essentially the VM that lambda runs in. This is mainly important if you develop your own runtimes/extensions, since the environment will send 'INIT' and 'SHUTDOWN' signals to them. Essentially due to the serverless nature, these 'INIT' and 'SHUTDOWN' can happen at any time, and you can pick them up if you want. Pretty advanced feature though.

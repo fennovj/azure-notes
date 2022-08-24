@@ -1,6 +1,19 @@
-# Deployment policies
+# Code services
 
-## Intro
+There are a bunch of CodeX services:
+
+CodeCommit - source control service. By itself, does just the git stuff, so no pipelines etc. You can manage access/clone/push rights/etc with IAM
+CodeBuild - Continuous Integration, does things like compiling, testing, building, and producing packages.
+CodeDeploy - Continuous Deployment: can deploy to EC2, Fargate, Lambda.
+
+CodePipeline - Continuous Delivery - This is basically the pipeline service that combines all the above. You can use any of the above seperately, or you can create a pipeline that gets code from codecommit, builds it, deploys it.
+
+CodeArtifact - Fully managed artifact repository. Basically like S3 but with some more metadata like domains/repositories that makes it easier to use. Mostly for use with CodeBuild.
+  However, you can also do stuff like host Pip repositories, so it's not just S3.
+
+## CodeDeploy Deployment policies
+
+### Intro
 
 Code Deploy provides two types of deployment:
 
@@ -65,7 +78,3 @@ All at once is done in a blue/green fashion, so no downtime.
 - Canary 10 percent 30 minutes
 
 - All at once
-
-## Task placement strategy
-
-TODO
