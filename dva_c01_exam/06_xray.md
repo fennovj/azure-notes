@@ -29,7 +29,7 @@ Lambda is smart enough that it will record info like execution time by itself. T
 
 ## X-ray SDK
 
-*Important* you must be running the X-ray daemon somewhere, X-ray doesn't just work magically, you have to pay for the daemon. Also, you must be able to communicate with the daemon on port 2000, UDP. If you want, in EC2, you can run the x-ray daemon on localhost, in which case you don't need to open port 2000.
+*Important* you must be running the X-ray daemon somewhere, X-ray doesn't just work magically, you have to pay for the daemon. (Edit: I think you can also call the 'PutTrace' api yourself, but it's more complicated?) Also, you must be able to communicate with the daemon on port 2000, UDP. If you want, in EC2 or ECS, you can run the x-ray daemon on localhost, in which case you don't need to open port 2000.
 
 Used in your own applications, e.g. EC2 or ECS. Works like:
 
