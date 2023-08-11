@@ -51,3 +51,13 @@ There are three methods:
 - copy/deploy task
   - this means its split into two tasks: copyfiles and deploy
   - The second 'deploy' task is very similar to the 'ARM deployment task' higher on this list. However, the difference is, the template is read from an accessible location (e.g. blob storage), rather than from git directly. The first 'copy' task simply copies the template to blob
+
+## Deployment modes
+
+ARM has two deployment modes. Both function similar to Terraform: create all resources, but if they already exist, update them where possible.
+
+- Complete mode: Delete all resources in the resource group not specified in the template.
+- Leave unchanged resources that are not specified in the template.
+
+Note that for existing resources, properties are overwritten, even if they aren't specified, like they would be in terraform. The 'leave unchanged' only applies to *resources* not specified, not to properties.
+

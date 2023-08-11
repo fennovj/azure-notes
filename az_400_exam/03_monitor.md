@@ -29,11 +29,11 @@ Azure DevOps pipelines can retrieve monitoring from Application Insights during 
 example: you can add a pre-deployment or post-deployment condition, that queries the acceptance environmet. If the query has a certain result, the release to production cannot proceed.
 
 Also, a common way to do this is to have 'alerts', basically part of a release pipeline is waiting if alerts come up, and if they do, do not promote from acceptance to production. This is called a pre-deployment condition', with an 'alert deployment gate'.
-Alternatively, you can have a post-deployment condition, where you deploy something, but after deployment, check if it's working, and if it's not working, do not 'promote' the release. This is e.g. used in Azure Web App, where you can have 2 apps simultaneously, such that one is the 'promoted' version, to reduce downtime during deployments.
+Alternatively, you can have a post-deployment condition, where you deploy something, but after deployment, check if it's working, and if it's not working, do not 'promote' the release. This is e.g. used in Azure Web App, where you can have 2 versions of an app simultaneously, such that one is the 'promoted' version, to reduce downtime during deployments.
 
 ### Kusto Query Language
 
-KQL is used in Azure Data Explorer, Azure Sentinel, and for us most importantly, Azure Monitor. It is a generic, rich query langage for searching through big data stores with cloud data. Generic docs for KQL (not Monitor specific) are here: <https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/>
+KQL is used in Azure Data Explorer, Azure Log Analytics, and Azure Monitor. It is a generic, rich query langage for searching through big data stores with cloud data. Generic docs for KQL (not Monitor specific) are here: <https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/>
 
 A KQL query generally looks like:
 
@@ -49,6 +49,15 @@ As is shown, there are `let`, `set` and `tabular expressions`. Here, `data` is a
 
 `let` statements set variables for the query. E.g. you can define mappings or shorthands. e.g.: `let mapping=dynamic({'a': 'b'})`, you can then apply this map to a column.
 `set` statements are for configuration options. Example `set querytrace=true` will create a trace for the query.
+
+### Search
+
+There is also a 'search' statement, which just generally searches for a certain term, like a substring, e.g. in a log. Example:
+
+```js
+search in (SysLog, Events, Stdout) "login failed"
+| where TimeGenerated > ago(1h)
+```
 
 ### Permissions
 
@@ -67,3 +76,16 @@ There are two ways to connect:
 
 - Secure webhook action: for this, you need to create a service principal to authenticate with ServiceNow. Then enter the webhook into Monitor. This is used for ServiceNow ITOM (IT operations management)
 - ITSM action: There is an ITSM action for ServiceNow ITSM (IT Service management). However, this is being deprecated. This works by ip whitelisting azure ip's from within ServiceNow.
+
+## Smart detection
+
+<https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/proactive-diagnostics>
+
+Smart detection automatically detects performance problems and anomalies in the web app. It is turned on automatically if your web app sends (enough) telemetry to applicatoin insights. E.g. if your app only gets a few requests an hour, it won't detect any issues.
+
+You can view the detections in the Azure Portal, or via email. You can also configure to only send emails for certain rules.
+
+## URL Ping test
+
+In application insights, you can add a 'classic ping test'. You add a url, and a frequency, and basically, it will make a GET request to that url every x minutes, and measure the response time. Of course, you can also set alerts if the response time/content is above a certain threshold
+
